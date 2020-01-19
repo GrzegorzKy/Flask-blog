@@ -86,6 +86,11 @@ def save_picture(form_picture):
     i.save(picture_path)
     
     return picture_fn
+
+
+def del_old_picture(old_picture):
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', old_picture)
+    os.remove(picture_path)
     
 
 
@@ -101,6 +106,7 @@ def account():
             db.session.commit()
             flash('your account has been updated', 'success')
         if form.picture.data:
+            del_old_picture(current_user.image_file)
             current_user.image_file = save_picture(form.picture.data)
             db.session.commit()
         return redirect(url_for('account'))
