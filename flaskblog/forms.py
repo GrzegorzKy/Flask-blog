@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
@@ -26,7 +27,7 @@ class RegistrationForm(FlaskForm):
         if email.data != current_user.email:
             email = User.query.filter_by(email=email.data).first()
             if email:
-                raise ValidationError('Email exists. Chooose other username.')
+                raise ValidationError('Email exists. Chooose other email.')
     
 
 class LoginForm(FlaskForm):
@@ -38,17 +39,18 @@ class LoginForm(FlaskForm):
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', 
-                           validators=[DataRequired(), Length(min=2, max=15)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+                           validators=[Length(min=2, max=15)])
+    email = StringField('Email', validators=[Email()])
+    picture = FileField('Update profile picture', validators=[FileAllowed(['jpg', 'png'])])
     submit = SubmitField('Update')
     
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
-        if user:
+        if user and user.username != current_user.username:
             raise ValidationError('Username exists. Chooose other username.')
     
     
     def validate_email(self, email):
         email = User.query.filter_by(email=email.data).first()
-        if email:
-            raise ValidationError('Email exists. Chooose other username.')
+        if email and email.email != current_user.email:
+            raise ValidationError('Email exists. Chooose other email.')

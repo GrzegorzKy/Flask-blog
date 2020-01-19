@@ -37,8 +37,7 @@ def register():
         return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data) \
-                            .decode('utf-8')
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
@@ -72,10 +71,24 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/account')
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
+    if form.validate_on_submit():
+        #inaczej blad, ze zajete - mozna rozdzielic per pole
+        if form.username.data != current_user.username or form.email.data != current_user.email:
+            current_user.username = form.username.data
+            current_user.email = form.email.data
+            db.session.commit()
+            flash('your account has been updated', 'success')
+        if form.picture.data != current_user.image_file:
+            current_user.image_file = form.email.data
+            db.session.commit()
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Your details', image_file=image_file, form=form)
 
