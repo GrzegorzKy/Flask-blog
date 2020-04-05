@@ -22,7 +22,7 @@ def save_picture(form_picture):
 
 
 def del_old_picture(old_picture):
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', old_picture)
+    picture_path = os.path.join(current_app.root_path, 'static/profile_pics', old_picture)
     os.remove(picture_path)
 
 
