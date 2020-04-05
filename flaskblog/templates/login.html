@@ -39,17 +39,17 @@
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
+            <small class="text-muted">
+            <a href="{{url_for('users.reset_request')}}">Forgot password?</a>
+            </small>
         </form>
-        <small class="text-muted ml-2">
-        <a href="#">Forgot password?</a>
-        </small>
     </div>
 
     <div class="border-top pt-3">
     <small class="text-muted">
         Need to register?
         <!--                           login - name of the function -->
-        <a class="ml-2" href="{{ url_for('register', filename='register.html') }}">
+        <a class="ml-2" href="{{ url_for('users.register', filename='register.html') }}">
         Sign up now!
         </a>
     </small>
