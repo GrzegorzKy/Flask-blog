@@ -7,7 +7,7 @@
 #from flaskblog.models import User
 
 
-print(__file__)
+
 
     
     
