@@ -26,6 +26,20 @@ class Tests(TestCase):
     def logout(self, tester):
         return tester.get("/logout", content_type="html/text")
     
+    def register(self, tester, creds: dict):
+        response = tester.get('/register', content_type='html/text')
+        if response.status_code != 200:
+            return None
+        
+        # cut out csfr_token
+        soup = bs(response.data, 'html.parser')
+        csrf_token = soup.find(id='csrf_token')["value"]
+        creds["csrf_token"] = csrf_token
+        
+        # register user with creds
+        response = tester.post('/register', data=creds)
+        return response
+    
     # required TestCase methods
     def create_app(self):     
         return create_app()
@@ -33,11 +47,29 @@ class Tests(TestCase):
     def setUp(self):
         self.app = self.create_app()
         self.creds = {"email": "ab@abc.com", "password": "1"}
+        self.new_user_creds = {"email": "abc@abc.com", "password": "1",
+                               "username": "abc", "confirm_password": "1"}
     
     def tearDown(self):
+        # todo: remove test user
         pass
     
     # test methods
+    # test register
+    def test_register(self):
+        print("\nTest Login")
+        tester = self.app.test_client(self)
+        
+        # unlogged
+        # blank creds
+        response = tester.post('/register', data={})
+        self.assert200(response)
+        # ...
+        
+        # valid creds
+        response = tester.post('/register', data=self.new_user_creds)
+        self.assertRedirects(response, url_for('users.login'))
+        
     def test_login(self):
         print("\nTest Login")
         tester = self.app.test_client(self)
